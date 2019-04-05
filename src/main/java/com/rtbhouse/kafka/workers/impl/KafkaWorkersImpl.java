@@ -10,6 +10,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
+import com.rtbhouse.kafka.workers.impl.punctuator.PunctuatorThread;
 import org.apache.kafka.common.TopicPartition;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -48,6 +49,7 @@ public class KafkaWorkersImpl<K, V> implements Partitioned {
 
     private ExecutorService executorService;
     private final List<WorkerThread<K, V>> workerThreads = new ArrayList<>();
+    private PunctuatorThread<K, V> punctuatorThread;
     private ConsumerThread<K, V> consumerThread;
 
     private ShutdownListenerThread shutdownThread;
@@ -82,15 +84,16 @@ public class KafkaWorkersImpl<K, V> implements Partitioned {
         final int numWorkers = config.getInt(WorkersConfig.WORKER_THREADS_NUM);
         consumerThread = new ConsumerThread<>(config, metrics, this, queueManager, subpartitionSupplier, offsetsState);
         for (int i = 0; i < numWorkers; i++) {
-            workerThreads.add(new WorkerThread<>(i, config, metrics, this,
-                    taskManager, queueManager, offsetsState));
+            workerThreads.add(new WorkerThread<>(i, config, metrics, this,  taskManager, queueManager, offsetsState));
         }
+        punctuatorThread = new PunctuatorThread<>(config, metrics, this, workerThreads);
 
-        executorService = Executors.newFixedThreadPool(1 + numWorkers);
+        executorService = Executors.newFixedThreadPool(2 + numWorkers);
         executorService.execute(consumerThread);
         for (WorkerThread<K, V> workerThread : workerThreads) {
             executorService.execute(workerThread);
         }
+        executorService.execute(punctuatorThread);
 
         setStatus(Status.STARTED);
         logger.info("kafka workers started");
@@ -132,6 +135,7 @@ public class KafkaWorkersImpl<K, V> implements Partitioned {
         metrics.removeSizeMetric(WORKER_THREAD_METRIC_GROUP, WORKER_THREAD_COUNT_METRIC_NAME);
 
         consumerThread.shutdown();
+        punctuatorThread.shutdown();
         for (WorkerThread<K, V> workerThread : workerThreads) {
             workerThread.shutdown();
         }

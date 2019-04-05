@@ -77,6 +77,15 @@ public class TaskManager<K, V> implements Partitioned {
         partitionToTaskMap.get(subpartition).notifyTask();
     }
 
+    public void notifyThreads() {
+        for (WorkerThread<K, V> thread : threads) {
+            thread.notifyThread();
+        }
+    }
+
+    void punctuate(long timestamp) {
+    }
+
     public void notifyTaskManager() {
         synchronized (rebalanceLock) {
             rebalanceLock.notifyAll();
