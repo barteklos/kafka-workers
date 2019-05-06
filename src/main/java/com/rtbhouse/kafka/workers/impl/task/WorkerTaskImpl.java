@@ -1,17 +1,26 @@
 package com.rtbhouse.kafka.workers.impl.task;
 
+import java.util.Set;
+
 import com.rtbhouse.kafka.workers.api.WorkersConfig;
-import com.rtbhouse.kafka.workers.api.WorkersException;
+import com.rtbhouse.kafka.workers.api.observer.RecordStatusObserver;
 import com.rtbhouse.kafka.workers.api.partitioner.WorkerSubpartition;
-import com.rtbhouse.kafka.workers.api.record.RecordStatusObserver;
 import com.rtbhouse.kafka.workers.api.record.WorkerRecord;
+import com.rtbhouse.kafka.workers.api.task.RecordProcessingGuarantee;
 import com.rtbhouse.kafka.workers.api.task.WorkerTask;
+import com.rtbhouse.kafka.workers.impl.KafkaWorkersImpl;
+import com.rtbhouse.kafka.workers.impl.errors.ProcessingFailureException;
 import com.rtbhouse.kafka.workers.impl.metrics.WorkersMetrics;
+import com.rtbhouse.kafka.workers.impl.observer.RecordStatusObserverImpl;
+import com.rtbhouse.kafka.workers.impl.observer.SubpartitionObserver;
+import com.rtbhouse.kafka.workers.impl.offsets.OffsetsState;
 
 public class WorkerTaskImpl<K, V> implements WorkerTask<K, V> {
 
     // user-defined task to process
     private final WorkerTask<K, V> task;
+
+    private final SubpartitionObserver subpartitionObserver;
 
     private final WorkersMetrics metrics;
 
@@ -20,8 +29,12 @@ public class WorkerTaskImpl<K, V> implements WorkerTask<K, V> {
 
     private WorkerThread<K, V> thread;
 
-    public WorkerTaskImpl(WorkerTask<K, V> task, WorkersMetrics metrics) {
+    public WorkerTaskImpl(
+            WorkerTask<K, V> task,
+            SubpartitionObserver subpartitionObserver,
+            WorkersMetrics metrics) {
         this.task = task;
+        this.subpartitionObserver = subpartitionObserver;
         this.metrics = metrics;
     }
 
@@ -61,6 +74,10 @@ public class WorkerTaskImpl<K, V> implements WorkerTask<K, V> {
     public void close() {
         task.close();
         metrics.removeWorkerThreadSubpartitionMetrics(subpartition);
+    }
+
+    public SubpartitionObserver observer() {
+        return subpartitionObserver;
     }
 
     public WorkerSubpartition subpartition() {

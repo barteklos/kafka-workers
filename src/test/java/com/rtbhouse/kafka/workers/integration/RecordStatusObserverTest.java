@@ -20,7 +20,7 @@ import com.rtbhouse.kafka.workers.api.KafkaWorkers;
 import com.rtbhouse.kafka.workers.api.ShutdownCallback;
 import com.rtbhouse.kafka.workers.api.WorkersConfig;
 import com.rtbhouse.kafka.workers.api.WorkersException;
-import com.rtbhouse.kafka.workers.api.record.RecordStatusObserver;
+import com.rtbhouse.kafka.workers.api.observer.RecordStatusObserver;
 import com.rtbhouse.kafka.workers.api.record.WorkerRecord;
 import com.rtbhouse.kafka.workers.api.task.WorkerTask;
 import com.rtbhouse.kafka.workers.api.task.WorkerTaskFactory;
@@ -77,7 +77,7 @@ public class RecordStatusObserverTest {
                 new ShutdownCallback() {
                     @Override
                     public void onShutdown(WorkersException exception) {
-                        exceptionToCheck.set(exception.getCause());
+                        exceptionToCheck.set(exception);
                         latch.countDown();
                     }
                 });

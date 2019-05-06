@@ -1,10 +1,9 @@
 package com.rtbhouse.kafka.workers.api.record;
 
+import com.rtbhouse.kafka.workers.api.partitioner.WorkerSubpartition;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.common.TopicPartition;
 import org.apache.kafka.common.header.Headers;
-
-import com.rtbhouse.kafka.workers.api.partitioner.WorkerSubpartition;
 
 public class WorkerRecord<K, V> {
 

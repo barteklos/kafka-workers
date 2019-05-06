@@ -2,7 +2,7 @@ package com.rtbhouse.kafka.workers.api.task;
 
 import com.rtbhouse.kafka.workers.api.WorkersConfig;
 import com.rtbhouse.kafka.workers.api.partitioner.WorkerSubpartition;
-import com.rtbhouse.kafka.workers.api.record.RecordStatusObserver;
+import com.rtbhouse.kafka.workers.api.observer.RecordStatusObserver;
 import com.rtbhouse.kafka.workers.api.record.WorkerRecord;
 
 /**
