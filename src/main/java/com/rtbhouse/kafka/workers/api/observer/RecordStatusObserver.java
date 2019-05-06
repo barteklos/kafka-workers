@@ -1,5 +1,6 @@
-package com.rtbhouse.kafka.workers.api.record;
+package com.rtbhouse.kafka.workers.api.observer;
 
+import com.rtbhouse.kafka.workers.api.record.WorkerRecord;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
 
 import com.rtbhouse.kafka.workers.api.task.WorkerTask;
@@ -7,8 +8,7 @@ import com.rtbhouse.kafka.workers.api.task.WorkerTask;
 /**
  * Every {@link WorkerRecord} is associated with its {@link RecordStatusObserver} which purpose is to report
  * record final status. It means that eventually one of methods: {@link #onSuccess()} or {@link #onFailure(Exception)}
- * has to be called for every {@link WorkerRecord} previously passed to
- * {@link WorkerTask#process(WorkerRecord, RecordStatusObserver)}.
+ * has to be called for every {@link WorkerRecord} previously passed to {@link WorkerTask#process(WorkerRecord, RecordStatusObserver)}.
  */
 public interface RecordStatusObserver {
 
@@ -26,5 +26,14 @@ public interface RecordStatusObserver {
      *            exception which caused a failure
      */
     void onFailure(Exception exception);
+
+    /**
+     * Allows user to combine observers' associated with different records.
+     * @param observer
+     *            observer which should be combined with given one
+     *
+     * @return new combined observer
+     */
+    void combine(RecordStatusObserver observer);
 
 }

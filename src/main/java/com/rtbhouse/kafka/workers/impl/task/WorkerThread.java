@@ -4,13 +4,13 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
-import com.rtbhouse.kafka.workers.impl.record.RecordStatusObserverImpl;
+import com.rtbhouse.kafka.workers.impl.observer.RecordStatusObserverImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.rtbhouse.kafka.workers.api.WorkersConfig;
 import com.rtbhouse.kafka.workers.api.WorkersException;
-import com.rtbhouse.kafka.workers.api.record.RecordStatusObserver;
+import com.rtbhouse.kafka.workers.api.observer.RecordStatusObserver;
 import com.rtbhouse.kafka.workers.api.record.WorkerRecord;
 import com.rtbhouse.kafka.workers.impl.AbstractWorkersThread;
 import com.rtbhouse.kafka.workers.impl.KafkaWorkersImpl;
@@ -116,10 +116,6 @@ public class WorkerThread<K, V> extends AbstractWorkersThread {
         super.shutdown(exception);
         // in case of shutdown we do not want to block thread any more
         notifyAll();
-    }
-
-    public int getWorkerId() {
-        return workerId;
     }
 
     public void clearTasks() {
