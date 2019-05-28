@@ -2,31 +2,34 @@ package com.rtbhouse.kafka.workers.impl.task;
 
 import com.rtbhouse.kafka.workers.api.WorkersConfig;
 import com.rtbhouse.kafka.workers.api.partitioner.WorkerSubpartition;
-import com.rtbhouse.kafka.workers.api.record.RecordStatusObserver;
+import com.rtbhouse.kafka.workers.api.observer.RecordStatusObserver;
 import com.rtbhouse.kafka.workers.api.record.WorkerRecord;
 import com.rtbhouse.kafka.workers.api.task.WorkerTask;
 import com.rtbhouse.kafka.workers.impl.metrics.WorkersMetrics;
+import com.rtbhouse.kafka.workers.impl.observer.SubpartitonObserver;
 
 public class WorkerTaskImpl<K, V> implements WorkerTask<K, V> {
 
     // user-defined task to process
     private final WorkerTask<K, V> task;
 
-    private final WorkersMetrics metrics;
-
     // subpartition which is associated with given task in one-to-one relation
     private WorkerSubpartition subpartition;
 
+    private final WorkersMetrics metrics;
+    // private final SubpartitonObserver observer;
+
     private WorkerThread<K, V> thread;
 
-    public WorkerTaskImpl(WorkerTask<K, V> task, WorkersMetrics metrics) {
+    public WorkerTaskImpl(WorkerTask<K, V> task, WorkerSubpartition subpartition, WorkersMetrics metrics) {
         this.task = task;
+        this.subpartition = subpartition;
         this.metrics = metrics;
+        this.observer = new SubpartitonObserver(subpartition);
     }
 
     @Override
     public void init(WorkerSubpartition subpartition, WorkersConfig config) {
-        this.subpartition = subpartition;
         metrics.addWorkerThreadSubpartitionMetrics(subpartition);
         task.init(subpartition, config);
     }

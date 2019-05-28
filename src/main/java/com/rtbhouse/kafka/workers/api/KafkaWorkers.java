@@ -3,7 +3,7 @@ package com.rtbhouse.kafka.workers.api;
 import com.rtbhouse.kafka.workers.api.partitioner.DefaultPartitioner;
 import com.rtbhouse.kafka.workers.api.partitioner.WorkerPartitioner;
 import com.rtbhouse.kafka.workers.api.partitioner.WorkerSubpartition;
-import com.rtbhouse.kafka.workers.api.record.RecordStatusObserver;
+import com.rtbhouse.kafka.workers.api.observer.RecordStatusObserver;
 import com.rtbhouse.kafka.workers.api.record.WorkerRecord;
 import com.rtbhouse.kafka.workers.api.task.WorkerTask;
 import com.rtbhouse.kafka.workers.api.task.WorkerTaskFactory;
